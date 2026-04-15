@@ -1,39 +1,125 @@
-# Assignment Five
+# CSC3916 Assignment 5 — React Movie App
+
+## Deployed Links
+
+| Service | URL |
+|---------|-----|
+| React Frontend (Assignment 5) | https://csc3916-assignment5-xher.onrender.com |
+| Backend API (Assignment 4) | https://csc3916-assignment4-5qd5.onrender.com |
+
+---
+
 ## Purpose
 
-The purpose of this assignment is to create a React Single Page App over your developed API.  The interface will allow the users to search for movies, display information about the movie, see stored ratings, and allow the user to enter a rating.
+A React Single Page Application built over the Assignment 4 REST API. Users can browse top-rated movies, view movie details with reviews, submit their own reviews, and search for movies by title or actor name.
 
-## Pre-Requirements
-- Assignment 3 deployed REACT app that supports SignUp and Logon
-- Assignment 4 that supports reviews
+---
 
-## Requirements
-- Update your API to support storing an image (or image URL) for the movies you have stored.  You will use the image URL in your React application to show the image of movies
-    - New Attribute on the movie collection
-- For this assignment all your endpoints should be protected by JWT authentication
-- Implement the following interfaces
-    - User SignUp and User Logon
-        - Leverage your User mongoDB collection to store new users of the application
-    - Main screen should show the top rated movies (show at least 5)
-        - Your GET /movies endpoint should sort by rating (server side)
-            - Update your /movies (with reviews=true) endpoint to sort by average rating descending
-    - Movie Detail screen, shows the Movie, Image, Actors that were in the movie, aggregated rating for the movie and grid that shows the reviews (username, rating, review)
-    - Extra Credit: (7 points) - chapter 25 of (https://www.amazon.com/dp/B0979MGJ5J?_encoding=UTF8&psc=1&ref_=cm_sw_r_cp_ud_dp_M9YGPJNZWB3BK0P59QX3) Movie Search – show results in a grid, accordion or other list control
-        - Add Search API (HTTP POST) to the API that can take partial movie names or partial actor names
+## Features Implemented
 
-## Submissions
-- User is able to Sign-up (name, username, password)
-- User is able to Logon to the application (username, password)
-- User is able to see list of movies and select a movie to see the detail screen (top rated movies displayed)
-- User is able to enter a review on the detail page (enter a rating and comment) – the logged in user’s username will be associated with the review (as captured from the JSON Web Token)
+### Authentication
+- User Sign Up (name, username, password)
+- User Login — returns JWT token stored in localStorage
+- All API endpoints protected by JWT authentication
+- Logout clears token from localStorage
 
-## Rubic
-- -3 Not able to add comments
-- -2 Not aggregating rating (average rating)
-- -3 if not pointed to correct end point (e.g Hw4 endpoint)
-- -5 if you don’t have a react web site deployed 
+### Main Screen
+- Displays top-rated movies in an auto-advancing carousel
+- Movies sorted by average rating descending (server-side)
+- Shows movie poster image, title, genre, release year, and average rating
 
-## Resources
-- https://github.com/facebook/create-react-app
-- https://github.com/mars/create-react-app-buildpack#user-content-requires
+### Movie Detail Screen
+- Movie poster image
+- Full cast list (actor name + character name)
+- Aggregated average rating (calculated via MongoDB `$avg`)
+- Reviews grid showing username, star rating, and review text
 
+### Review Submission
+- Logged-in users can submit a rating (1–5) and review comment
+- Username is captured from the JWT token (not from the form)
+- Page auto-refreshes with updated reviews and new average rating after submission
+
+### Movie Search (Extra Credit — 7 points)
+- Search by partial movie title or partial actor name (case-insensitive)
+- Results displayed in a sortable grid with title, year, genre, and average rating
+- Clicking a result navigates to the movie detail page
+- Backend: `POST /movies/search` with MongoDB `$regex` matching
+
+---
+
+## Tech Stack
+
+### Frontend
+- React 19
+- Redux Toolkit + redux-thunk (state management)
+- React Router DOM v7 with HashRouter
+- React Bootstrap (UI components)
+- React Icons (star ratings)
+
+### Backend
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT authentication (passport-jwt)
+- bcrypt password hashing
+
+---
+
+## API Endpoints
+
+All endpoints require `Authorization: JWT <token>` header except `/signup` and `/signin`.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/signup` | Register new user |
+| POST | `/signin` | Login, returns JWT token |
+| GET | `/movies` | Get all movies |
+| GET | `/movies?reviews=true` | Get all movies with reviews, sorted by avgRating desc |
+| GET | `/movies/:id?reviews=true` | Get single movie with reviews and avgRating |
+| POST | `/movies` | Create a movie |
+| PUT | `/movies/:id` | Update a movie |
+| DELETE | `/movies/:id` | Delete a movie |
+| POST | `/reviews` | Submit a review (username from JWT) |
+| POST | `/movies/search` | Search movies by partial title or actor name |
+
+---
+
+## Running Locally
+
+### Backend (Assignment 4)
+```bash
+cd CSC3916_Assignment4
+npm install
+npm start
+```
+Requires a `.env` file with:
+```
+DB=<mongodb connection string>
+SECRET_KEY=<jwt secret>
+```
+
+### Frontend (Assignment 5)
+```bash
+cd frontend
+npm install
+npm start
+```
+Requires a `.env` file with:
+```
+REACT_APP_API_URL=https://csc3916-assignment4-5qd5.onrender.com
+```
+
+---
+
+## Postman Tests
+
+A Postman collection is included in the Assignment 4 repository: `CSC3916_Assignment4.postman_collection.json`
+
+Tests cover:
+- Sign up and sign in (JWT token auto-saved)
+- Invalid credentials (401 response)
+- GET all movies with imageUrl present
+- GET movies sorted by avgRating descending
+- GET movie by ID with reviews
+- POST review (valid and invalid)
+- POST search by title and actor name
+- Protected endpoint rejection without token (401)
