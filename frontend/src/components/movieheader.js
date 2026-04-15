@@ -18,7 +18,7 @@ function MovieHeader() {
     return (
         <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
             <Container>
-                <Navbar.Brand as={NavLink} to="/">🎬 Movie App</Navbar.Brand>
+                <Navbar.Brand as={NavLink} to="/">🎬 Yaseer's Movie App</Navbar.Brand>
                 <Navbar.Toggle aria-controls="main-nav" />
                 <Navbar.Collapse id="main-nav">
                     <Nav className="me-auto">
